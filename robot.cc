@@ -29,10 +29,16 @@ void Robot::ejecutarBusqueda() {
 
   int iterador = 0; 
   bool solucion_encontrada = false; 
+  std::ofstream ficheroIteraciones("iteraciones.txt", std::ios::out | std::ios::trunc);
+  ficheroIteraciones.clear();
+  if (!ficheroIteraciones.is_open()) {
+    std::cerr << "No se ha podido abrir el fichero de iteraciones" << std::endl;
+    exit(EXIT_FAILURE);
+  }
 
   while(!abiertos.empty()) {
     //IMPRIMIR ITERACION ANTERIOR
-    imprimirIteracion(iterador, abiertos, cerrados);
+    imprimirIteracion(iterador, abiertos, cerrados, ficheroIteraciones);
     ++iterador; 
 
     Estado actual = *abiertos.top();
@@ -100,41 +106,89 @@ void Robot::ejecutarBusqueda() {
   if(!solucion_encontrada) {
     imprimirNoResultado();
   }
+  ficheroIteraciones.close();
 }
 
-void Robot::imprimirIteracion(int iterador, std::priority_queue<Estado*, std::vector<Estado*>, ComparadorEstado>& abiertos, const std::vector<Estado*>& cerrado) {
+void Robot::imprimirIteracion(int iterador, std::priority_queue<Estado*, std::vector<Estado*>, ComparadorEstado>& abiertos, const std::vector<Estado*>& cerrado, std::ofstream& ficheroIteraciones) {
   std::priority_queue<Estado*, std::vector<Estado*>, ComparadorEstado> abiertos_copia = abiertos;
 
   std::cout << "Iteracion " << iterador << std::endl;
   std::cout << "--------------" << std::endl;
   std::cout << "Abiertos = ";
+
+  ficheroIteraciones << "Iteracion " << iterador << std::endl;
+  ficheroIteraciones << "--------------" << std::endl;
+  ficheroIteraciones << "Abiertos = ";
+
   while(!abiertos_copia.empty()) {
     Estado estado = *abiertos_copia.top();
     abiertos_copia.pop();
     std::cout << "(" << estado.fila_ << ", " << estado.columna_ << ") ";
+    ficheroIteraciones << "(" << estado.fila_ << ", " << estado.columna_ << ") ";
   }
   std::cout << std::endl << "Cerrados = "; 
+  ficheroIteraciones << std::endl << "Cerrados = ";
   for(auto estado : cerrado) {
     std::cout << "(" << estado->fila_ << ", " << estado->columna_ << ") ";
+    ficheroIteraciones << "(" << estado->fila_ << ", " << estado->columna_ << ") ";
   }
   std::cout << std::endl << "--------------------------" << std::endl;
+  ficheroIteraciones << std::endl << "--------------------------" << std::endl;
+  ficheroIteraciones.flush();
+
 }
 
 void Robot::imprimirResultado(const std::vector<Estado*>& camino_encontrado) {
   int coste = 0;
+  std::ofstream salida("resultado.txt");
+  if(!salida.is_open()) {
+    std::cerr << "El fichero de salida no se ha podido abrir" << std::endl;
+    exit(EXIT_FAILURE);
+  }
+
+  std::vector<std::vector<int>> mapa = entorno_.getEntorno();
+  std::set<std::pair<int, int>> camino_set;
+  for (const auto* estado : camino_encontrado) {
+    camino_set.insert({estado->fila_, estado->columna_});
+  }
+
+  for (int i = 0; i < mapa.size(); ++i) {
+    for (int j = 0; j < mapa[i].size(); ++j) {
+      if (camino_set.count({i, j}) > 0) {
+        salida << " * ";
+      } else {
+        salida << " " << mapa[i][j] << " ";
+      }
+    }
+    salida << std::endl;
+  }
+
   std::cout << "Camino: ";
+  salida << "Camino: ";
+
   for(auto estado : camino_encontrado) {
     int fila = estado->fila_;
     int columna = estado->columna_;
     coste = coste + entorno_.Coste(fila, columna);
     std::cout << "(" << estado->fila_ << ", " << estado->columna_ << ") -> ";
+    salida << "(" << estado->fila_ << ", " << estado->columna_ << ") -> ";
   }
   std::cout << std::endl;
   std::cout << "Coste: " << coste << std::endl;
 
+  salida << std::endl;
+  salida<< "Coste: " << coste << std::endl;
+
 }
 
 void Robot::imprimirNoResultado() {
+  std::ofstream salida("resultado.txt");
+  if(!salida.is_open()) {
+    std::cerr << "El fichero de salida no se ha podido abrir" << std::endl;
+    exit(EXIT_FAILURE);
+  }
   std::cout << "No se ha encontrado ninguna solucion al problema" << std::endl;
+  salida << "No se ha encontrado ninguna solucion al problema" << std::endl;
+  salida.close();
   exit(EXIT_SUCCESS);
 }
