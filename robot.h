@@ -28,6 +28,9 @@ class Robot {
     //Metodos
     int funcionHeuristica(int fila, int columna, int destinoFila, int destinoColumna) const;
     void ejecutarBusqueda();
+    void imprimirResultado(const std::vector<Estado*>& camino_encontrado);
+    void imprimirIteracion(int iterador, std::priority_queue<Estado*, std::vector<Estado*>, ComparadorEstado>& abiertos, const std::vector<Estado*>& cerrado);
+    void imprimirNoResultado(void);
 
   private: 
     Entorno entorno_; 

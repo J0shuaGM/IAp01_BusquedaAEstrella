@@ -13,10 +13,10 @@
 TARGET = busqueda
 
 # Lista de archivos fuente(.cc)
-SOURCES = cliente.cc entorno.cc tools.cc
+SOURCES = cliente.cc entorno.cc tools.cc robot.cc
 
 # Dependencias de los archivos fuente 
-DEPENDENCIES = entorno.h tools.h
+DEPENDENCIES = entorno.h tools.h robot.h estado.h
 
 # Opciones de compilación
 CXX = g++

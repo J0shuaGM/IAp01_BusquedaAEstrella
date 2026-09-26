@@ -39,7 +39,7 @@ class Entorno {
     std::pair<int, int> getDestino(void) const { return destino_; }
 
     //Metodos
-    int Coste(int fila, int columna) { return entorno_[fila][columna]; }
+    int Coste(int fila, int columna);
     bool MovimientoValido(int fila, int columna);
 
     //Sobrecarga de operadores

@@ -10,8 +10,9 @@
 
 #include <iostream>
 
-#include "entorno.h"
 #include "tools.h"
+#include "robot.h"
+#include "estado.h"
 
 int main(int argc, char *argv[]) {
   Usage(argc, argv); 
@@ -22,7 +23,8 @@ int main(int argc, char *argv[]) {
     exit(EXIT_FAILURE);
   }
   Entorno entorno(entrada); 
-  std::cout << entorno; 
   entrada.close();
+  Robot robot(entorno);
+  robot.ejecutarBusqueda();
   return 0; 
 }

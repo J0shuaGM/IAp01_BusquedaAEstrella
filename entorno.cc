@@ -52,6 +52,11 @@ bool Entorno::MovimientoValido(int fila, int columna) {
   return true; 
 }
 
+int Entorno::Coste(int fila, int columna) {
+  if(entorno_[fila][columna] == 10) return 2; 
+  return entorno_[fila][columna];
+}
+
 std::ostream& operator<<(std::ostream& os, const Entorno& entorno) {
   std::vector<std::vector<int>> mapa = entorno.getEntorno();
   for (const auto& fila : mapa) {

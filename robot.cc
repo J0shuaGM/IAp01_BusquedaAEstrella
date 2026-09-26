@@ -27,7 +27,14 @@ void Robot::ejecutarBusqueda() {
   inicial.padre_ = nullptr;
   abiertos.push(new Estado(inicial));
 
+  int iterador = 0; 
+  bool solucion_encontrada = false; 
+
   while(!abiertos.empty()) {
+    //IMPRIMIR ITERACION ANTERIOR
+    imprimirIteracion(iterador, abiertos, cerrados);
+    ++iterador; 
+
     Estado actual = *abiertos.top();
     abiertos.pop();
     if(actual.posicion == entorno_.getDestino()) {
@@ -38,21 +45,29 @@ void Robot::ejecutarBusqueda() {
         ruta = ruta->padre_;
       }
       std::reverse(camino_encontrado.begin(), camino_encontrado.end());
+
       //IMPRIMIR RESULTADO
+      imprimirResultado(camino_encontrado);
+      solucion_encontrada = true;
+      break;
     }
     cerrados.push_back(new Estado(actual));
-    for(int i = 0; i <= 4; ++i) {
+    for(int i = 0; i < 4; ++i) {
       int fila_vecino = actual.fila_ + MovimientoFila_[i]; 
       int columna_vecino = actual.columna_ + MovimientoColumna_[i]; 
       Estado vecino(fila_vecino, columna_vecino);
       if(!entorno_.MovimientoValido(fila_vecino, columna_vecino)) {
         continue;
       }
+      bool en_cerrado = false;
       for(auto estado : cerrados) {
         if(estado->CompararPos(vecino)) {
-          continue; 
+          en_cerrado = true;
+          break;
         }
       }
+      if(en_cerrado) continue;
+
       int vecino_costeAcumulado = actual.costeAcumulado_ + entorno_.Coste(fila_vecino, columna_vecino); 
       int vecino_heuristica = funcionHeuristica(fila_vecino, columna_vecino, entorno_.getDestino().first, entorno_.getDestino().second);
       int vecino_costeFinal = vecino_costeAcumulado + vecino_heuristica;
@@ -82,5 +97,44 @@ void Robot::ejecutarBusqueda() {
       }
     }
   }
-  //Imprimir que no se ha encontrado camino
+  if(!solucion_encontrada) {
+    imprimirNoResultado();
+  }
+}
+
+void Robot::imprimirIteracion(int iterador, std::priority_queue<Estado*, std::vector<Estado*>, ComparadorEstado>& abiertos, const std::vector<Estado*>& cerrado) {
+  std::priority_queue<Estado*, std::vector<Estado*>, ComparadorEstado> abiertos_copia = abiertos;
+
+  std::cout << "Iteracion " << iterador << std::endl;
+  std::cout << "--------------" << std::endl;
+  std::cout << "Abiertos = ";
+  while(!abiertos_copia.empty()) {
+    Estado estado = *abiertos_copia.top();
+    abiertos_copia.pop();
+    std::cout << "(" << estado.fila_ << ", " << estado.columna_ << ") ";
+  }
+  std::cout << std::endl << "Cerrados = "; 
+  for(auto estado : cerrado) {
+    std::cout << "(" << estado->fila_ << ", " << estado->columna_ << ") ";
+  }
+  std::cout << std::endl << "--------------------------" << std::endl;
+}
+
+void Robot::imprimirResultado(const std::vector<Estado*>& camino_encontrado) {
+  int coste = 0;
+  std::cout << "Camino: ";
+  for(auto estado : camino_encontrado) {
+    int fila = estado->fila_;
+    int columna = estado->columna_;
+    coste = coste + entorno_.Coste(fila, columna);
+    std::cout << "(" << estado->fila_ << ", " << estado->columna_ << ") -> ";
+  }
+  std::cout << std::endl;
+  std::cout << "Coste: " << coste << std::endl;
+
+}
+
+void Robot::imprimirNoResultado() {
+  std::cout << "No se ha encontrado ninguna solucion al problema" << std::endl;
+  exit(EXIT_SUCCESS);
 }
