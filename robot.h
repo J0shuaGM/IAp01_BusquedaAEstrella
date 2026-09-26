@@ -13,8 +13,12 @@
 
 #include <iostream>
 #include <cmath>
+#include <vector>
+#include <queue>
+#include <algorithm>
 
 #include "entorno.h"
+#include "estado.h"
 
 class Robot {
   public: 

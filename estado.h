@@ -17,6 +17,7 @@
 
 struct Estado {
   int fila_, columna_; 
+  std::pair<int, int> posicion{fila_, columna_};
 
   int costeAcumulado_; //g(s)
   int valorHeuristica_; // h(s)
@@ -29,6 +30,16 @@ struct Estado {
   
   bool operator>(const Estado& otro) const {
     return this->fila_ > otro.fila_;
+  }
+  
+  bool CompararPos(const Estado& otro) const {
+    return (this->fila_ == otro.fila_ && this->columna_ == otro.columna_);
+  }
+};
+
+struct ComparadorEstado {
+  bool operator()(const Estado* a, const Estado* b) {
+    return a->valorFuncion_ > b->valorFuncion_;
   }
 };
 
